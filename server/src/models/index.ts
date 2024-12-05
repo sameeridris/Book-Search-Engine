@@ -1,3 +1,4 @@
 import User from './User';
+import bookSchema from './Book';
 
-export default { User };
+export default { bookSchema, User };
