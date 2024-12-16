@@ -1,4 +1,5 @@
-import { bookSchema, User } from '../models/index.js';
+import { Book, User }  from '../models/index.js';
+
 
 import { signToken, AuthenticationError } from '../utils/auth.js';
 
@@ -47,10 +48,10 @@ const resolvers = {
             return User.findOne({ username }).populate('books');
         },
         books: async () => {
-            return await bookSchema.find().sort({ createdAt: -1 });
+            return await Book.find().sort({ createdAt: -1 });
         },
         book: async (_parent: any, { bookId }: BookArgs) => {
-            return await bookSchema.findOne({ _id: bookId });
+            return await Book.findOne({ _id: bookId });
         },
         // Query to get the authenticated user's information
         me: async (_parent: any, _args: any, context: any) => {
@@ -97,11 +98,11 @@ const resolvers = {
         },
         addBook: async (_parent: any, { input }: AddBookArgs, context: any) => {
             if (context.user) {
-                const book = await bookSchema.create({ ...input });
+                const book = await Book.create({ ...input });
 
                 await User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $addToSet: { books: bookSchema._id } }
+                    { $addToSet: { books: Book._id } }
                 );
 
                 return book;
@@ -111,18 +112,18 @@ const resolvers = {
         },
         removeThought: async (_parent: any, { bookId }: BookArgs, context: any) => {
             if (context.user) {
-                const book = await bookSchema.findOneAndDelete({
+                const book = await Book.findOneAndDelete({
                     _id: bookId,
 
                 });
 
-                if (!bookSchema) {
+                if (!Book) {
                     throw AuthenticationError;
                 }
 
                 await User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $pull: { thoughts: bookSchema._id } }
+                    { $pull: { thoughts: Book._id } }
                 );
 
                 return book;
